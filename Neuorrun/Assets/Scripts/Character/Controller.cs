@@ -13,7 +13,11 @@ public class Controller : MonoBehaviour
     private Rigidbody2D _rigidbody;
     private float _horizontalInput;
     private bool isFacingRight = true;
-    private bool _isInteracting = false;
+    public bool _canInteract = false;
+    public bool _isInteracting = false;
+
+    
+
 
 
 
@@ -105,12 +109,24 @@ public class Controller : MonoBehaviour
 
     #region Interact
 
+    private bool _isButtonHeld = false;
+
     public void Interact(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && _canInteract)
         {
             _isInteracting = true;
-            Debug.Log("Interact");
+            _isButtonHeld = true;
+
+
+        }
+
+ 
+
+        if (context.canceled)
+        {
+                _isButtonHeld = false;
+                _isInteracting = false;
         }
     }
 
