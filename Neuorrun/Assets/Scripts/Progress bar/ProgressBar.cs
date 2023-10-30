@@ -9,9 +9,11 @@ public class ProgressBar : MonoBehaviour
     public Image progressBar;
     [SerializeField] RectTransform fxHolder;
     [SerializeField] GameObject interactable;
+    private float lerpSpeed = 2f ;
+
 
     float progress, goal = 1f;
-    float lerpSpeed;
+
 
     private void Start()
     {
@@ -23,43 +25,37 @@ public class ProgressBar : MonoBehaviour
         
         if (progress > goal) progress = goal;
 
-        lerpSpeed = 2f * Time.deltaTime;
+     
 
         progress = goal - interactable.GetComponent<Interactable.InteractableObject>().getProgress();
-        Debug.Log(progress);
-        HealthBarFiller();
+        
+        progressBarFill();
         ColorChanger();
         fxHolderUpdate();
-        HealthBarDecrease();
+        progressBarEmpty();
     }
 
-    void HealthBarFiller()
+    void progressBarFill()
     {
         float targetFillAmount = progress;
         float currentFillAmount = progressBar.fillAmount;
 
-    
-      
 
-        
 
-        float calculatedFillAmount = Mathf.MoveTowards(currentFillAmount, targetFillAmount, 2*lerpSpeed);
-
-       
- 
+        float calculatedFillAmount = Mathf.MoveTowards(currentFillAmount, targetFillAmount, lerpSpeed * Time.deltaTime);
 
 
         if (currentFillAmount < targetFillAmount)
         progressBar.fillAmount = calculatedFillAmount;
     }
 
-    void HealthBarDecrease()
+    void progressBarEmpty()
     {
-       /* progress = Mathf.MoveTowards(progress, 0, 1.5f * Time.deltaTime);*/
+   
 
         float targetFillAmount = progress;
         float currentFillAmount = progressBar.fillAmount;
-        float calculatedFillAmount = Mathf.MoveTowards(currentFillAmount, targetFillAmount, lerpSpeed);
+        float calculatedFillAmount = Mathf.MoveTowards(currentFillAmount, targetFillAmount, lerpSpeed * Time.deltaTime);
 
         progressBar.fillAmount = calculatedFillAmount;
     }
@@ -78,13 +74,8 @@ public class ProgressBar : MonoBehaviour
         float targetAngle = -(progress) * 360;
         float currentAngle = fxHolder.rotation.eulerAngles.z;
         float angle = Mathf.LerpAngle(currentAngle, targetAngle, lerpSpeed*4);
-/*        float angle2 = Mathf.MoveTowards(currentAngle, targetAngle, lerpSpeed);*/
-        /*        fxHolder.rotation = Quaternion.Euler(new Vector3(0f, 0f, angle2));*/
         fxHolder.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
-        /*Debug.Log(angle + "/" + angle2);*/
-        /*        float angle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, 2f * Time.deltaTime);
-                fxHolder.rotation = Quaternion.Euler(fxHolder.rotation.x, fxHolder.rotation.y, angle);*/
     
 
 
@@ -92,7 +83,7 @@ public class ProgressBar : MonoBehaviour
 
     public void setProgress(float progress)
     {
-      /*  this.progress = progress;*/
+      this.progress = progress;
     }
 
 

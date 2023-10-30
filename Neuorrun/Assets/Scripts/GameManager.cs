@@ -1,0 +1,61 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class GameManager : MonoBehaviour
+{
+    public static GameManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public static void LoadScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+    }
+
+    public static void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public static void LoadNextLevel()
+    {
+        string currentLevelName = SceneManager.GetActiveScene().name;
+        int currentLevelIndex = int.Parse(currentLevelName.Substring(5));
+        if (currentLevelIndex < PlayerPrefs.GetInt("NumberOfLevels"))
+        {
+            SceneManager.LoadScene("Level" + (currentLevelIndex + 1));
+        }
+        else
+        {
+            SceneManager.LoadScene("Levels");
+        }
+   
+    }
+
+    public void ResumeTime()
+    {
+        Time.timeScale = 1;
+    }
+
+    void Update()
+    {
+        
+    }
+
+
+    public static void AppQuit()
+    {
+        Application.Quit();
+    }
+}

@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Interactable
   - ProgressBar
+  - PopupMenu
+  - Portal
+  - Aura
   layers:
   - Default
   - TransparentFX
@@ -18,8 +21,8 @@ TagManager:
   - Blocks
   - Wall
   - Interactable
-  - 
-  - 
+  - Moving
+  - Portal
   - 
   - 
   - 

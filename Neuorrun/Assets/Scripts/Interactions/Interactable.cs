@@ -25,13 +25,13 @@ public class Interactable : MonoBehaviour
     public void enterZone()
     {
         progressBar.SetActive(true);
-        Debug.Log("Player entered zone");
+      
     }
 
     public void exitZone()
     {
         progressBar.SetActive(false);
-        Debug.Log("Player exited zone");
+        
     }
 
     public void setProgressBar(float progress)
