@@ -44,7 +44,7 @@ public class Controller : MonoBehaviour
     private bool _isJumping = false;
     private bool _jumpButtonIsHeld = false;
     public Transform groundCheck;
-    public LayerMask groundLayer;
+    public List<LayerMask> groundLayers;
     bool _isGrounded;
     Vector2 vecGravity ;
 
@@ -172,10 +172,17 @@ public class Controller : MonoBehaviour
 
     private bool isGrounded()
     {
-        _isGrounded = Physics2D.OverlapCapsule(groundCheck.position, groundCheckCollider.size, CapsuleDirection2D.Horizontal, 0 , groundLayer);
+        foreach(var layer in groundLayers)
+        {
+            _isGrounded = Physics2D.OverlapCapsule(groundCheck.position, groundCheckCollider.size, CapsuleDirection2D.Horizontal, 0, layer);
+            if (_isGrounded)
+            {
+                return true;
+            }
+        }
+
 
         return _isGrounded;
-      
     }
     
  
