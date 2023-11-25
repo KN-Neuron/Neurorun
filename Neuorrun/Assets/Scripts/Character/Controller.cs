@@ -35,7 +35,7 @@ public class Controller : MonoBehaviour
     private float _currentSpeed;
 
 
-    private bool _canCoyoteJump = true;
+    public bool _canCoyoteJump = true;
     private float _coyoteTimeCounter;
     private bool _isBufferedJumping;
     private float _bufferedJumpTimeCounter;
@@ -152,6 +152,7 @@ public class Controller : MonoBehaviour
         {
             _jumpCount = 0;
             _coyoteTimeCounter = 0;
+            _canCoyoteJump = true;
             if (_isBufferedJumping &&_bufferedJumpTimeCounter < _bufferedJumpTime)
             {
                 startJump();
@@ -189,7 +190,7 @@ public class Controller : MonoBehaviour
 
     void Update()
     {
-        /*Debug.Log(_coyoteTimeCounter);*/
+
 
 
         _connectionState.SetConnectionState(poorSignalLevel, tcgController.IsConnected());
@@ -350,11 +351,19 @@ public class Controller : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.started && (_isGrounded || _jumpCount < _extraJumps || _coyoteTimeCounter< _coyoteTime))
+        if (context.started && (_isGrounded || _coyoteTimeCounter< _coyoteTime))
         {
            
             startJump();
+            _canCoyoteJump = false;
+            _coyoteTimeCounter = _coyoteTime;
+            _jumpButtonIsHeld = true;
+        }
+        else if(context.started && _jumpCount < _extraJumps)
+        {
             _jumpCount++;
+            startJump();
+            _canCoyoteJump = false;
             _coyoteTimeCounter = _coyoteTime;
             _jumpButtonIsHeld = true;
         }
