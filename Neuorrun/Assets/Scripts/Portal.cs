@@ -35,4 +35,9 @@ public class Portal : MonoBehaviour
             _player.transform.position = Vector3.MoveTowards(_player.transform.position, transform.position, 0.01f);
         }
     }
+
+    public void Vanish()
+    {
+        
+    }
 }

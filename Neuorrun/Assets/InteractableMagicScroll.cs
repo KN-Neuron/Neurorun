@@ -2,16 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MagicScroll : MonoBehaviour, Interactable.InteractableObject
+public class InteractableMagicScroll : MonoBehaviour, Interactable.InteractableObject
 {
     [SerializeField] private float dissapearTime = 3f;
 
-    private bool isInteracting = false;
     private float interactionProgress = 0f;
-    private float interactionSpeed = 0.5f;
-    private float interactionTime = 0f;
-    private float interactionMaxTime = 2f;
-    private bool isInteracted = false;
     private float dissapearTimeLeft;
 
     private void Awake()
@@ -21,9 +16,6 @@ public class MagicScroll : MonoBehaviour, Interactable.InteractableObject
 
     private void Update()
     {
-    
-
-
             dissapearTimeLeft -= Time.deltaTime;
             if (dissapearTimeLeft <= 0)
             {
@@ -34,16 +26,21 @@ public class MagicScroll : MonoBehaviour, Interactable.InteractableObject
 
     public float getProgress()
     {
-        throw new System.NotImplementedException();
+        return 1-interactionProgress;
     }
 
     public void interact(float interactionProgress)
     {
-        throw new System.NotImplementedException();
+
+        this.interactionProgress = interactionProgress;
+        if (interactionProgress >= 1)
+        {
+           Destroy(GetComponentInParent<Interactable>().gameObject);
+        }
     }
 
     public void reset()
     {
-        throw new System.NotImplementedException();
+        interactionProgress = 0f;
     }
 }

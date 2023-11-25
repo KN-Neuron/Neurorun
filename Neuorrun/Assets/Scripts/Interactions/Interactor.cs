@@ -12,6 +12,7 @@ public class Interactor : MonoBehaviour
         {
             Interactable interactable = other.gameObject.GetComponent<Interactable>();
             interactables.Add(interactable);
+            Debug.Log("Added interactable to list" + interactable);
             interactable.enterZone();
             isInteracting = true;
         }

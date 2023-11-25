@@ -7,6 +7,7 @@ enum BossState
 {
     Start,
     Idle,
+    BeamAttack,
     LeftBeamAttack,
     RightBeamAttack,
     DoubleBeamAttack,
@@ -28,16 +29,17 @@ public class BossStateMachine : MonoBehaviour
     [SerializeField] private GameObject healParticles;
     [SerializeField] private GameObject deathParticles;
     [SerializeField] private GameObject bossHealthBar;
-    [SerializeField] private Transform enemyLeftSpawnPoint;
-    [SerializeField] private Transform enemyRightSpawnPoint;
     [SerializeField] private int health;
     [SerializeField] private int maxHealth;
     [SerializeField] private int damageAmount;
     [SerializeField] private int healAmount;
+    [SerializeField] private int maxConsecutiveAttacks=2;
     [SerializeField] private GameObject spikesAttackTelegraph;
     [SerializeField] private GameObject beamLeftAttackTelegraph;
     [SerializeField] private GameObject beamRightAttackTelegraph;
     [SerializeField] private GameObject enemySpawnAttackTelegraph;
+    [SerializeField] private WaveSpawner waveSpawner;
+    [SerializeField] private Transform playerRespawn;
 
     [SerializeField] private float changeStateTime;
     [SerializeField] private float changeStateTimeVariation;
@@ -46,12 +48,16 @@ public class BossStateMachine : MonoBehaviour
     private Dictionary<BossState, Action> stateActions;
 
     private bool isTakingAction;
-    private bool isHealing;
-    private bool isDamaged;
+    private bool isHealing =false;
+    private bool isDamaged =false;
     private int consecutiveAttacks = 0;
+    private BossState lastState=BossState.Start;
+    private DeathManager deathManager;
 
     private void Awake()
     {
+        deathManager = FindObjectOfType<DeathManager>();
+        deathManager.setLastGroundPosition(playerRespawn.position);
         currentState = BossState.Start;
         InitializeTransitions();
         InitializeStateActions();
@@ -62,9 +68,41 @@ public class BossStateMachine : MonoBehaviour
         // Initialize the dictionary and add possible transitions for each state
         possibleTransitions = new Dictionary<BossState, List<BossState>>();
 
-        // Example: AddTransition(BossState.Start, BossState.Idle);
-        // Example: AddTransition(BossState.Idle, BossState.LeftBeamAttack);
-        // ... add more transitions
+        AddTransition(BossState.Start, BossState.Idle);
+
+        AddTransition(BossState.Idle, BossState.BeamAttack);
+        AddTransition(BossState.Idle, BossState.EnemySpawnAttack);
+        AddTransition(BossState.Idle, BossState.SpikeAttack);
+
+
+
+        AddTransition(BossState.LeftBeamAttack, BossState.Idle);
+        AddTransition(BossState.RightBeamAttack, BossState.Idle);
+        AddTransition(BossState.DoubleBeamAttack, BossState.Idle);
+        AddTransition(BossState.EnemySpawnAttack, BossState.Idle);
+        AddTransition(BossState.SpikeAttack, BossState.Idle);
+        AddTransition(BossState.Damaged, BossState.Idle);
+        AddTransition(BossState.Heal, BossState.Idle);
+
+        AddTransition(BossState.Damaged, BossState.LeftBeamAttack);
+        AddTransition(BossState.Damaged, BossState.RightBeamAttack);
+        AddTransition(BossState.Damaged, BossState.DoubleBeamAttack);
+        AddTransition(BossState.Damaged, BossState.EnemySpawnAttack);
+        AddTransition(BossState.Damaged, BossState.SpikeAttack);
+
+
+
+        AddTransition(BossState.Heal, BossState.Idle);
+        AddTransition(BossState.Heal, BossState.LeftBeamAttack);
+        AddTransition(BossState.Heal, BossState.RightBeamAttack);
+        AddTransition(BossState.Heal, BossState.DoubleBeamAttack);
+        AddTransition(BossState.Heal, BossState.EnemySpawnAttack);
+        AddTransition(BossState.Heal, BossState.Damaged);
+
+        AddTransition(BossState.BeamAttack, BossState.LeftBeamAttack);
+        AddTransition(BossState.BeamAttack, BossState.RightBeamAttack);
+        AddTransition(BossState.BeamAttack, BossState.DoubleBeamAttack);
+
     }
 
     private void InitializeStateActions()
@@ -72,10 +110,10 @@ public class BossStateMachine : MonoBehaviour
         // Initialize the dictionary and add actions for each state
         stateActions = new Dictionary<BossState, Action>();
 
-        stateActions[BossState.SpikeAttack] = () => { spikeAttack(1.0f); };
-        stateActions[BossState.LeftBeamAttack] = () => { leftBeamAttack(1.0f); };
-        stateActions[BossState.RightBeamAttack] = () => { rightBeamAttack(1.0f); };
-        stateActions[BossState.DoubleBeamAttack] = () => { doubleBeamAttack(1.0f); };
+        stateActions[BossState.SpikeAttack] = () => { spikeAttack(1.5f); };
+        stateActions[BossState.LeftBeamAttack] = () => { leftBeamAttack(3.0f); };
+        stateActions[BossState.RightBeamAttack] = () => { rightBeamAttack(3.0f); };
+        stateActions[BossState.DoubleBeamAttack] = () => { doubleBeamAttack(1.5f); };
         stateActions[BossState.Heal] = () => { heal(healAmount); };
         stateActions[BossState.EnemySpawnAttack] = () => { spawnEnemy(); };
         stateActions[BossState.Damaged] = () => { damage(); };
@@ -102,20 +140,60 @@ public class BossStateMachine : MonoBehaviour
 
     private void Update()
     {
-        if (!isTakingAction)
+        if (health <= 0)
         {
-            StartCoroutine(ChangeStateAfterDelay());
+            changeState(BossState.Death);
         }
+
+        if(deathManager.isKilled)
+        {
+            changeState(BossState.Heal);
+        }
+
+        if (currentState!=BossState.Damaged && BossState.Heal!=currentState && currentState!=BossState.Death)
+        {
+            if (!isTakingAction)
+            {
+                StartCoroutine(ChangeStateAfterDelay());
+            }
+        }
+  
+
     }
 
     private IEnumerator ChangeStateAfterDelay()
     {
         isTakingAction = true;
 
-        float randomDelay = UnityEngine.Random.Range(changeStateTime - changeStateTimeVariation, changeStateTime + changeStateTimeVariation);
-        yield return new WaitForSeconds(randomDelay);
+        if (currentState != BossState.BeamAttack)
+        {
+            float randomDelay = UnityEngine.Random.Range(changeStateTime - changeStateTimeVariation, changeStateTime + changeStateTimeVariation);
+            yield return new WaitForSeconds(randomDelay);
+        }
+       
+        if(currentState!= BossState.Idle)
+        {
+            lastState = currentState;
+        }
 
         BossState nextState = GetRandomTransition(currentState);
+
+        if (lastState == nextState)
+        {
+            consecutiveAttacks++;
+            if (consecutiveAttacks >= maxConsecutiveAttacks)
+            {
+                while (nextState == lastState)
+                {
+                    nextState = GetRandomTransition(currentState);
+                }
+            }
+        }
+        else
+        {
+            consecutiveAttacks = 0;
+        }
+
         PerformStateAction(nextState);
 
         currentState = nextState;
@@ -133,17 +211,32 @@ public class BossStateMachine : MonoBehaviour
         return currentState;
     }
 
+    private void changeState(BossState state)
+    {
+        currentState = state;
+    }
+
     private IEnumerator SpikeAttackCoroutine(float time)
     {
         yield return telegraphAttack(spikesAttackTelegraph, time);
 
-        Vector3 targetPosition = new Vector3(spikes.transform.position.x, spikesOffset, spikes.transform.position.z);
+        Vector3 initialPosition = spikes.transform.position;
+        Vector3 targetPosition = new Vector3(spikes.transform.position.x, spikes.transform.position.y+spikesOffset, spikes.transform.position.z);
 
-        while (spikes.transform.position.y < spikesOffset)
+        while (spikes.transform.position.y < targetPosition.y)
         {
             spikes.transform.position = Vector3.MoveTowards(spikes.transform.position, targetPosition, time * Time.deltaTime);
             yield return null;
         }
+
+        yield return clearSpikes(initialPosition);
+    }
+
+    private IEnumerator clearSpikes(Vector3 initialPosition)
+    {
+
+        yield return new WaitForSeconds(0.2f);
+        spikes.transform.position = initialPosition;
     }
 
     private void spikeAttack(float time)
@@ -165,18 +258,33 @@ public class BossStateMachine : MonoBehaviour
 
     private void leftBeamAttack(float time)
     {
-        // Implementation for the left beam attack
+        StartCoroutine(beamAttackCoroutine(beamLeftAttackTelegraph, leftBeam, time));
     }
 
     private void rightBeamAttack(float time)
     {
-        // Implementation for the right beam attack
+        StartCoroutine(beamAttackCoroutine(beamRightAttackTelegraph, rightBeam, time));
     }
 
     private void doubleBeamAttack(float time)
     {
-        // Implementation for the double beam attack
+        StartCoroutine(beamAttackCoroutine(beamLeftAttackTelegraph,leftBeam, time));
+        StartCoroutine(beamAttackCoroutine(beamRightAttackTelegraph, rightBeam, time));
     }
+
+    private IEnumerator beamAttackCoroutine(GameObject beamTelegraph, GameObject beam, float time)
+    {
+        yield return telegraphAttack(beamTelegraph, 0.5f);
+
+        beam.SetActive(true);
+        
+        yield return new WaitForSeconds(time);
+
+        beam.GetComponent<Animator>().SetTrigger("Despawned");
+        beam.SetActive(false);
+        
+    }
+
 
     private void heal(int healAmount)
     {
@@ -186,7 +294,14 @@ public class BossStateMachine : MonoBehaviour
 
     private void spawnEnemy()
     {
-        // Implementation for spawning an enemy
+        StartCoroutine(spawnEnemyCoroutine());
+    }
+
+    private IEnumerator spawnEnemyCoroutine()
+    {
+        yield return telegraphAttack(enemySpawnAttackTelegraph, 0.5f);
+
+        waveSpawner.SpawnRandomWave();
     }
 
     private void damage()
