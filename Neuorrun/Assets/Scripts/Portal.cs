@@ -24,7 +24,7 @@ public class Portal : MonoBehaviour
             _player = other.gameObject;
             other.GetComponent<Animator>().SetBool("Exit",true);
             GetComponent<Animator>().SetTrigger("Close");
-        
+            EndGame();
         }
     }
 
