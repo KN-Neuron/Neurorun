@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: BothSidesSingle
+  m_EditorClassIdentifier: Assembly-CSharp::WaveSettings
+  enemyPrefab: {fileID: 2269222464151012897, guid: 6aaaf194648b7ef4eac1df255a39b999, type: 3}
+  numberOfEnemiesLeft: 1
+  numberOfEnemiesRight: 1
+  leftSpawnPoint: {fileID: 2582587934636206244, guid: 383cad128e66ed04b9057dce5aa1ede5, type: 3}
+  rightSpawnPoint: {fileID: 2074732952995077008, guid: e4a1097da4c519146abca8839ed91cab, type: 3}
+  timeIntervalBetweenSpawns: 0
+  spawnAllAtOnce: 1

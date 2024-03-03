@@ -7,18 +7,25 @@ public class DeathManager : MonoBehaviour
     public LayerMask _groundLayer;
     public Vector3 _lastGroundPosition;
     public float _groundCheckLength=1f;
+    public bool isBossFight = false;
+    public bool isKilled = false;
    
 
     // Update is called once per frame
     void Update()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, _groundCheckLength, _groundLayer);
-        if (hit.collider != null)
+        if (hit.collider != null && !isBossFight)
         {
-            Debug.Log("Hit" + transform.position);
+
             _lastGroundPosition = transform.position;
             
         }
+    }
+
+    public void setLastGroundPosition(Vector3 position)
+    {
+        _lastGroundPosition = position;
     }
 
     private void OnDrawGizmos()
@@ -28,6 +35,7 @@ public class DeathManager : MonoBehaviour
 
     public void Kill()
     {
+        isKilled = true;
         GetComponent<Animator>().SetBool("isRespawned", false);
         gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
         gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
@@ -52,6 +60,6 @@ public class DeathManager : MonoBehaviour
         gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
         gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
         GameObject.FindGameObjectsWithTag("Aura")[0].GetComponent<SpriteRenderer>().enabled = true;
-
+        isKilled = false;
     }
 }
