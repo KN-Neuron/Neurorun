@@ -2125,10 +2125,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -752.9999389648438,
-            "y": 787.0,
-            "width": 165.99993896484376,
-            "height": 34.0
+            "x": -755.3334350585938,
+            "y": 786.0,
+            "width": 167.333251953125,
+            "height": 36.0
         }
     },
     "m_Slots": [
@@ -2749,10 +2749,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -171.5,
-            "y": 399.0000305175781,
-            "width": 101.00003051757813,
-            "height": 33.999969482421878
+            "x": -229.9999542236328,
+            "y": 372.0,
+            "width": 102.6666488647461,
+            "height": 36.0
         }
     },
     "m_Slots": [
@@ -3143,7 +3143,7 @@
     "m_ZTestMode": 4,
     "m_AlphaMode": 0,
     "m_RenderFace": 2,
-    "m_AlphaClip": false,
+    "m_AlphaClip": true,
     "m_CustomEditorGUI": ""
 }
 
@@ -3157,7 +3157,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "AlphaClipThreshold",
     "m_StageCapability": 2,
-    "m_Value": 0.699999988079071,
+    "m_Value": 0.10999999940395355,
     "m_DefaultValue": 0.5,
     "m_Labels": []
 }

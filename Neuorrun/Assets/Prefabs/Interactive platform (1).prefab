@@ -418,7 +418,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -555,7 +555,6 @@ MonoBehaviour:
   finalDestination: {fileID: 841566492610170901}
   startingPoint: {fileID: 2953286736845482020}
   platformCollider: {fileID: 8397563816424688874}
-  interactionSpace: {fileID: 8397563816424688874}
   player: {fileID: 0}
   risingSpeed: 4
   loweringSpeed: 1.5

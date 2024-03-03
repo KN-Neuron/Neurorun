@@ -25,9 +25,9 @@ TagManager:
   - Portal
   - Scroll
   - Enemy
-  - 
-  - 
-  - 
+  - Background
+  - PostProcessing
+  - Cave
   - 
   - 
   - 
@@ -45,4 +45,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 37742305
+    locked: 0
+  - name: Cave
+    uniqueID: 606389891
+    locked: 0
+  - name: Foreground
+    uniqueID: 237689237
+    locked: 0
+  - name: Magic particles
+    uniqueID: 2691872757
+    locked: 0
+  - name: Aura
+    uniqueID: 3409509733
     locked: 0
