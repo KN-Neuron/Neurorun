@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2995975728943232916}
   - component: {fileID: 1209213496800220417}
   - component: {fileID: 5312722827239076905}
+  - component: {fileID: 121446159081862616}
   m_Layer: 12
   m_Name: ScrollPortal
   m_TagString: Untagged
@@ -120,6 +121,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 442762544e5282543968bf317aeae79b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &121446159081862616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7840589861359631654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eafd6dce7b2e84a40969bee1613bbbea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeToDissapear: 1.5
 --- !u!1 &8144318405431017747
 GameObject:
   m_ObjectHideFlags: 0

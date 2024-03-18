@@ -11,6 +11,7 @@ public class Portal : MonoBehaviour
 
     void EndGame()
     {
+        Time.timeScale = 0;
         _endMenu.SetTime();
         _endMenu.showMenu();
     }

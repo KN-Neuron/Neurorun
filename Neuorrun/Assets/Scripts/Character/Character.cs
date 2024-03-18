@@ -88,7 +88,7 @@ public class Character : MonoBehaviour
     {
         if (collision.gameObject.tag == "Portal")
         {
-            endScreen.GetComponent<EndMenu>().SetTime();
+
             endScreen.GetComponent<EndMenu>().PauseMenu();
            
            

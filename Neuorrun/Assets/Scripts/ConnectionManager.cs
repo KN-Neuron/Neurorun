@@ -21,11 +21,11 @@ public class ConnectionManager : MonoBehaviour
 
     public void SetConnectionState(int poorSignalLevel, bool isConnected)
     {
-        if(!isConnected)
+        if (!isConnected)
         {
             gameObject.GetComponent<Image>().color = noConnection;
         }
-       else if(poorSignalLevel >=100)
+        else if (poorSignalLevel >= 100)
         {
             gameObject.GetComponent<Image>().color = weakConnection;
         }
@@ -37,5 +37,6 @@ public class ConnectionManager : MonoBehaviour
         {
             gameObject.GetComponent<Image>().color = bestConnection;
         }
+
     }
 }

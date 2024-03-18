@@ -4992,6 +4992,7 @@ GameObject:
   - component: {fileID: 3633660093948377289}
   - component: {fileID: 4340427791138966663}
   - component: {fileID: 5556177579297184199}
+  - component: {fileID: 2716080600289581385}
   m_Layer: 10
   m_Name: Magic scroll
   m_TagString: Interactable
@@ -5101,6 +5102,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   progressBar: {fileID: 2628761238816419274}
+--- !u!114 &2716080600289581385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3923824003862512381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eafd6dce7b2e84a40969bee1613bbbea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeToDissapear: 10
 --- !u!1 &4768889655595908088
 GameObject:
   m_ObjectHideFlags: 0
@@ -5192,7 +5206,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d1955660fa4c314c88d8977d7578bd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dissapearTime: 1000
+  timeToUse: 5
+  spellCast: {fileID: 8691019109414250025, guid: 96c1cebf2d675494b85e35fd5c74dd53, type: 3}
+  spellCastPosition: {fileID: 0}
 --- !u!212 &2096527061915886563
 SpriteRenderer:
   m_ObjectHideFlags: 0

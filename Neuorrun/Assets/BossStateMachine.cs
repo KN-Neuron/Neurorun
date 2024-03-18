@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,9 +29,9 @@ public class BossStateMachine : MonoBehaviour
     [SerializeField] private float spikesOffset;
     [SerializeField] private GameObject healParticles;
     [SerializeField] private GameObject deathParticles;
-    [SerializeField] private GameObject bossHealthBar;
     [SerializeField] private int health;
     [SerializeField] private int maxHealth;
+    [SerializeField] private CustomSliding healthBar;
     [SerializeField] private int damageAmount;
     [SerializeField] private int healAmount;
     [SerializeField] private int maxConsecutiveAttacks=2;
@@ -40,6 +41,9 @@ public class BossStateMachine : MonoBehaviour
     [SerializeField] private GameObject enemySpawnAttackTelegraph;
     [SerializeField] private WaveSpawner waveSpawner;
     [SerializeField] private Transform playerRespawn;
+    [SerializeField] private Portal endPortal;
+    [SerializeField] private GameObject leftSpawn;
+    [SerializeField] private GameObject rightSpawn;
 
     [SerializeField] private float changeStateTime;
     [SerializeField] private float changeStateTimeVariation;
@@ -50,6 +54,7 @@ public class BossStateMachine : MonoBehaviour
     private bool isTakingAction;
     private bool isHealing =false;
     private bool isDamaged =false;
+    private bool isDead = false;
     private int consecutiveAttacks = 0;
     private BossState lastState=BossState.Start;
     private DeathManager deathManager;
@@ -97,7 +102,6 @@ public class BossStateMachine : MonoBehaviour
         AddTransition(BossState.Heal, BossState.RightBeamAttack);
         AddTransition(BossState.Heal, BossState.DoubleBeamAttack);
         AddTransition(BossState.Heal, BossState.EnemySpawnAttack);
-        AddTransition(BossState.Heal, BossState.Damaged);
 
         AddTransition(BossState.BeamAttack, BossState.LeftBeamAttack);
         AddTransition(BossState.BeamAttack, BossState.RightBeamAttack);
@@ -138,25 +142,50 @@ public class BossStateMachine : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        healthBar.StartFilling((float)health/(float)maxHealth);
+    }
+
     private void Update()
     {
-        if (health <= 0)
+        if (health <= 0 && !isDead)
         {
-            changeState(BossState.Death);
-        }
 
-        if(deathManager.isKilled)
-        {
-            changeState(BossState.Heal);
-        }
-
-        if (currentState!=BossState.Damaged && BossState.Heal!=currentState && currentState!=BossState.Death)
-        {
-            if (!isTakingAction)
+            //kill all enemies
+            foreach (EnemyFollowPlayer enemy in FindObjectsOfType<EnemyFollowPlayer>())
             {
-                StartCoroutine(ChangeStateAfterDelay());
+                Destroy(enemy);
+            }
+
+            PerformStateAction(BossState.Death);
+        }
+        else
+        {
+            if (deathManager.isKilled && !isHealing)
+            {
+                Debug.Log("Killed");
+                isHealing = true;
+                changeState(BossState.Heal);
+                PerformStateAction(currentState);
+            }
+
+            /*      if (!deathManager.isKilled && currentState == BossState.Heal)
+                  {
+                      changeState(BossState.Idle);
+                  }*/
+
+
+            if (currentState != BossState.Damaged && BossState.Heal != currentState && !isDead)
+            {
+                if (!isTakingAction && !isHealing)
+                {
+                    StartCoroutine(ChangeStateAfterDelay());
+                }
             }
         }
+
+       
   
 
     }
@@ -288,8 +317,21 @@ public class BossStateMachine : MonoBehaviour
 
     private void heal(int healAmount)
     {
-        // Implementation for healing
-        // Use healAmount to determine the amount of healing
+        Debug.Log("Healing");
+        health += healAmount;
+        health = Mathf.Clamp(health, 0, maxHealth);
+
+        //Play healing animation and after finish come back to usual thing and clear all mobs
+
+        healthBar.StartFilling((float)health / (float)maxHealth);
+
+        deathManager.isKilled = false;
+        isHealing = false;
+
+        foreach (EnemyFollowPlayer enemy in FindObjectsOfType<EnemyFollowPlayer>())
+        {
+            Destroy(enemy.gameObject);
+        }
     }
 
     private void spawnEnemy()
@@ -301,16 +343,38 @@ public class BossStateMachine : MonoBehaviour
     {
         yield return telegraphAttack(enemySpawnAttackTelegraph, 0.5f);
 
-        waveSpawner.SpawnRandomWave();
+        Debug.Log("Spawning enemy");
+        var leftEnemy = enemyPrefab;
+        leftEnemy.transform.rotation = Quaternion.Euler(0, 180, 0);
+        Instantiate(leftEnemy, leftSpawn.transform.position, leftEnemy.transform.rotation, transform);
+        Instantiate(enemyPrefab, rightSpawn.transform.position, enemyPrefab.transform.rotation, transform);
     }
 
-    private void damage()
+    public void damage()
     {
-        // Implementation for taking damage
+        Debug.Log("Damaged");
+        health -= damageAmount;
+        health = Mathf.Clamp(health, 0, maxHealth);
+        healthBar.StartFilling((float)health / (float)maxHealth);
+     
     }
+
+   
 
     private void death()
     {
+        Debug.Log("Dead");
+        isDead = true;
         // Implementation for death
+        GetComponent<Animator>().SetTrigger("Death");
+        StartCoroutine(deathCoroutine());
+
+
+    }
+
+    private IEnumerator deathCoroutine()
+    {
+        yield return new WaitForSeconds(3f);
+        endPortal.gameObject.SetActive(true);
     }
 }

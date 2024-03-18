@@ -17,5 +17,5 @@ MonoBehaviour:
   numberOfEnemiesRight: 1
   leftSpawnPoint: {fileID: 2582587934636206244, guid: 383cad128e66ed04b9057dce5aa1ede5, type: 3}
   rightSpawnPoint: {fileID: 2074732952995077008, guid: e4a1097da4c519146abca8839ed91cab, type: 3}
-  timeIntervalBetweenSpawns: 0
+  timeIntervalBetweenSpawns: 1
   spawnAllAtOnce: 1

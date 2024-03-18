@@ -19,10 +19,7 @@ public class WaveSpawner : MonoBehaviour
 {
     public List<WaveSettings> waves = new List<WaveSettings>();
 
-    private void Start()
-    {
-       
-    }
+
 
     private IEnumerator SpawnWaves()
     {
@@ -54,7 +51,9 @@ public class WaveSpawner : MonoBehaviour
 
     private void SpawnAllAtOnce(WaveSettings wave)
     {
-        SpawnEnemies(wave.leftSpawnPoint.transform, wave.numberOfEnemiesLeft, wave.enemyPrefab);
+        var leftSideEnemy = wave.enemyPrefab;
+        leftSideEnemy.transform.rotation = Quaternion.Euler(0, 180, 0);
+        SpawnEnemies(wave.leftSpawnPoint.transform, wave.numberOfEnemiesLeft, leftSideEnemy);
         SpawnEnemies(wave.rightSpawnPoint.transform, wave.numberOfEnemiesRight, wave.enemyPrefab);
         Debug.Log("Spawned " + wave.numberOfEnemiesLeft + " enemies on the left and " + wave.numberOfEnemiesRight + " enemies on the right.");
     }
@@ -69,7 +68,7 @@ public class WaveSpawner : MonoBehaviour
     {
         for (int i = 0; i < numberOfEnemies; i++)
         {
-            Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+            Instantiate(enemyPrefab, spawnPoint.position, enemyPrefab.transform.rotation, transform);
         }
     }
 
@@ -77,7 +76,7 @@ public class WaveSpawner : MonoBehaviour
     {
         for (int i = 0; i < numberOfEnemies; i++)
         {
-            Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+            Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation, transform);
             yield return new WaitForSeconds(timeInterval);
         }
     }
@@ -85,5 +84,14 @@ public class WaveSpawner : MonoBehaviour
     private WaveSettings GetRandomWave()
     {
         return waves[Random.Range(0, waves.Count)];
+    }
+
+    public void ClearAllMobs()
+    {
+        foreach (Transform child in transform)
+        {
+            //Play animatoion
+            Destroy(child.gameObject);
+        }
     }
 }

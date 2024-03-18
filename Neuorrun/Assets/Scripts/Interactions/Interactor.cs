@@ -31,7 +31,9 @@ public class Interactor : MonoBehaviour
 
     public void interact(float interactionProgress)
     {
-        foreach (Interactable interactable in interactables)
+        List<Interactable> tempList = new List<Interactable>(interactables);
+
+        foreach (Interactable interactable in tempList)
         {
             Interactable.InteractableObject interactableObject = interactable.GetComponentInChildren<Interactable.InteractableObject>();
             if (interactableObject != null)
