@@ -11,6 +11,7 @@ public class Portal : MonoBehaviour
 
     void EndGame()
     {
+        Time.timeScale = 0;
         _endMenu.SetTime();
         _endMenu.showMenu();
     }
@@ -24,7 +25,7 @@ public class Portal : MonoBehaviour
             _player = other.gameObject;
             other.GetComponent<Animator>().SetBool("Exit",true);
             GetComponent<Animator>().SetTrigger("Close");
-        
+            EndGame();
         }
     }
 
@@ -34,5 +35,10 @@ public class Portal : MonoBehaviour
         {
             _player.transform.position = Vector3.MoveTowards(_player.transform.position, transform.position, 0.01f);
         }
+    }
+
+    public void Vanish()
+    {
+        
     }
 }

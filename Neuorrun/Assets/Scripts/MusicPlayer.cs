@@ -10,6 +10,7 @@ public class MusicPlayer : MonoBehaviour
     public AudioClip level2Music;
     public AudioClip level3Music;
     public AudioClip level4Music;
+    public AudioClip level5Music;
 
 
 
@@ -35,7 +36,8 @@ public class MusicPlayer : MonoBehaviour
             { "Level1", level1Music },
             { "Level2", level2Music },
             { "Level3", level3Music },
-            { "Level4", level4Music }
+            { "Level4", level4Music },
+            { "Level5", level5Music }
         };
 
             SceneManager.sceneLoaded += OnSceneLoaded;

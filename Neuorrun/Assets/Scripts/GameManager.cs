@@ -31,15 +31,27 @@ public class GameManager : MonoBehaviour
     public static void LoadNextLevel()
     {
         string currentLevelName = SceneManager.GetActiveScene().name;
-        int currentLevelIndex = int.Parse(currentLevelName.Substring(5));
-        if (currentLevelIndex < PlayerPrefs.GetInt("NumberOfLevels"))
+        try
         {
-            SceneManager.LoadScene("Level" + (currentLevelIndex + 1));
+            int currentLevelIndex = int.Parse(currentLevelName.Substring(currentLevelName.Length - 1));
+            if (currentLevelIndex < PlayerPrefs.GetInt("NumberOfLevels"))
+            {
+                SceneManager.LoadScene("Level" + (currentLevelIndex + 1));
+            }
+            else
+            {
+                SceneManager.LoadScene("Levels");
+            }
         }
-        else
+        catch (System.Exception e)
         {
+            Debug.Log(e);
             SceneManager.LoadScene("Levels");
         }
+
+
+
+     
    
     }
 

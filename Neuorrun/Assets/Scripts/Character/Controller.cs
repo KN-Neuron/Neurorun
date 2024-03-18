@@ -35,7 +35,7 @@ public class Controller : MonoBehaviour
     private float _currentSpeed;
 
 
-    private bool _canCoyoteJump = true;
+    public bool _canCoyoteJump = true;
     private float _coyoteTimeCounter;
     private bool _isBufferedJumping;
     private float _bufferedJumpTimeCounter;
@@ -44,7 +44,7 @@ public class Controller : MonoBehaviour
     private bool _isJumping = false;
     private bool _jumpButtonIsHeld = false;
     public Transform groundCheck;
-    public LayerMask groundLayer;
+    public List<LayerMask> groundLayers;
     bool _isGrounded;
     Vector2 vecGravity ;
 
@@ -152,6 +152,7 @@ public class Controller : MonoBehaviour
         {
             _jumpCount = 0;
             _coyoteTimeCounter = 0;
+            _canCoyoteJump = true;
             if (_isBufferedJumping &&_bufferedJumpTimeCounter < _bufferedJumpTime)
             {
                 startJump();
@@ -172,17 +173,24 @@ public class Controller : MonoBehaviour
 
     private bool isGrounded()
     {
-        _isGrounded = Physics2D.OverlapCapsule(groundCheck.position, groundCheckCollider.size, CapsuleDirection2D.Horizontal, 0 , groundLayer);
+        foreach(var layer in groundLayers)
+        {
+            _isGrounded = Physics2D.OverlapCapsule(groundCheck.position, groundCheckCollider.size, CapsuleDirection2D.Horizontal, 0, layer);
+            if (_isGrounded)
+            {
+                return true;
+            }
+        }
+
 
         return _isGrounded;
-      
     }
     
  
 
     void Update()
     {
-        /*Debug.Log(_coyoteTimeCounter);*/
+
 
 
         _connectionState.SetConnectionState(poorSignalLevel, tcgController.IsConnected());
@@ -343,11 +351,19 @@ public class Controller : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.started && (_isGrounded || _jumpCount < _extraJumps || _coyoteTimeCounter< _coyoteTime))
+        if (context.started && (_isGrounded || _coyoteTimeCounter< _coyoteTime))
         {
            
             startJump();
+            _canCoyoteJump = false;
+            _coyoteTimeCounter = _coyoteTime;
+            _jumpButtonIsHeld = true;
+        }
+        else if(context.started && _jumpCount < _extraJumps)
+        {
             _jumpCount++;
+            startJump();
+            _canCoyoteJump = false;
             _coyoteTimeCounter = _coyoteTime;
             _jumpButtonIsHeld = true;
         }

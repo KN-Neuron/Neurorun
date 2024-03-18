@@ -150,7 +150,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -249,7 +249,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -429,14 +429,16 @@ MonoBehaviour:
   _jumpMultiplier: 1.1
   groundCheckCollider: {fileID: 4190279104279345604}
   _jumpSlowdownRate: 0.45
-  _coyoteTime: 0.7
+  _coyoteTime: 0.1
   _bufferedJumpTime: 0.07
   _accelerationRate: 40
   _maxSpeed: 8
   _decelerationRate: 8
+  _canCoyoteJump: 1
+  _jumpCount: 0
   groundCheck: {fileID: 8484336270803798097}
-  groundLayer:
-    serializedVersion: 2
+  groundLayers:
+  - serializedVersion: 2
     m_Bits: 2176
   _canInteract: 0
   _isInteracting: 0
@@ -446,6 +448,7 @@ MonoBehaviour:
   _connectionState: {fileID: 0}
   _runningParticles: {fileID: 0}
   _landingParticles: {fileID: 0}
+  isOnMoving: 0
 --- !u!50 &5507999038069538745
 Rigidbody2D:
   serializedVersion: 4
@@ -576,6 +579,8 @@ MonoBehaviour:
     m_Bits: 128
   _lastGroundPosition: {x: 0, y: 0, z: 0}
   _groundCheckLength: 0.42
+  isBossFight: 0
+  isKilled: 0
 --- !u!70 &1770129832283108375
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -737,7 +742,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

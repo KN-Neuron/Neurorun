@@ -12,6 +12,7 @@ public class Interactor : MonoBehaviour
         {
             Interactable interactable = other.gameObject.GetComponent<Interactable>();
             interactables.Add(interactable);
+            Debug.Log("Added interactable to list" + interactable);
             interactable.enterZone();
             isInteracting = true;
         }
@@ -30,7 +31,9 @@ public class Interactor : MonoBehaviour
 
     public void interact(float interactionProgress)
     {
-        foreach (Interactable interactable in interactables)
+        List<Interactable> tempList = new List<Interactable>(interactables);
+
+        foreach (Interactable interactable in tempList)
         {
             Interactable.InteractableObject interactableObject = interactable.GetComponentInChildren<Interactable.InteractableObject>();
             if (interactableObject != null)
