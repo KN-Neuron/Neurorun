@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Portal : MonoBehaviour
@@ -7,6 +5,11 @@ public class Portal : MonoBehaviour
     public EndMenu _endMenu;
     bool _isPlayerInZone = false;
     public GameObject _player;
+
+    public void Start()
+    {
+        Time.timeScale = 1;
+    }
 
 
     void EndGame()

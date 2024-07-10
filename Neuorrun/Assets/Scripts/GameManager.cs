@@ -20,12 +20,16 @@ public class GameManager : MonoBehaviour
 
     public static void LoadScene(string sceneName)
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene(sceneName);
+     
     }
 
     public static void ReloadScene()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
     }
 
     public static void LoadNextLevel()

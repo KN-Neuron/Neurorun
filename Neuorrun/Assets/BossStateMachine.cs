@@ -303,7 +303,7 @@ public class BossStateMachine : MonoBehaviour
 
     private IEnumerator beamAttackCoroutine(GameObject beamTelegraph, GameObject beam, float time)
     {
-        yield return telegraphAttack(beamTelegraph, 0.5f);
+        yield return telegraphAttack(beamTelegraph, 0.9f);
 
         beam.SetActive(true);
         
