@@ -9,7 +9,7 @@ namespace MindWave
 
         private int indexSignalIcons = 1;
 
-        private TGCConnectionController controller;
+        private EEGConnectionController controller;
 
         private int poorSignal1;
         private int attention1;
@@ -20,7 +20,7 @@ namespace MindWave
         private void Start()
         {
 
-            controller = GameObject.Find("NeuroSkyTGCController").GetComponent<TGCConnectionController>();
+            controller = GameObject.Find("NeuroSkyTGCController").GetComponent<EEGConnectionController>();
 
             controller.UpdatePoorSignalEvent += OnUpdatePoorSignal;
             controller.UpdateAttentionEvent += OnUpdateAttention;

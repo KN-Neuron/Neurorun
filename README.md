@@ -13,25 +13,39 @@
 
 ## Opis
 
-"Neurorun" to projekt gry w Unity, w którym gracz może sterować postacią za pomocą pada lub klawiatury. Gra pozwala graczowi na interakcję z otoczeniem, za pomocą urządzenia NeuroSky Mobile 2, za pomocą parametru skupienia.
+"Neurorun" to projekt gry w Unity, w którym gracz może sterować postacią za pomocą pada lub klawiatury. Gra pozwala graczowi na interakcję z otoczeniem, za pomocą urządzenia EEG (NeuroSky Mobile 2 lub czepka EEG obsługiwanego przez Neurostate), za pomocą parametru skupienia.
 
 ## Wymagania
 
 - Unity (wersja 2022.3.7f1)
 - Pad lub klawiatura
-- Neurofiszka Bridge i Thinkgear Connector 
-- Urządzenie NeuroSky Mobile 2 
+- Urządzenie EEG, jedno z:
+  - NeuroSky Mobile 2 z Neurofiszka Bridge i Thinkgear Connector
+  - dowolny czepek EEG nadający sygnał przez LSL, z uruchomionym Neurostate
 
 ## Uruchamianie Projektu
 
 1. Sklonuj repozytorium na swoje lokalne urządzenie.
 2. Otwórz projekt w Unity (wersja 2022.3.7f1).
 3. Przejdź do folderu "Scenes" i otwórz scenę "Menu" lub wybierz opcję "Build and Run" w Unity.
-4. Aby połączyć się z urządzeniem EEG NeuroSky Mobile 2, użyj Neurofiszka Bridge i Thinkgear Connector.
+4. Aby połączyć się z urządzeniem EEG, uruchom Neurostate albo, dla NeuroSky Mobile 2, Neurofiszka Bridge i Thinkgear Connector (szczegóły poniżej).
+
+### Połączenie z EEG
+
+Gra odczytuje poziom skupienia (attention) z jednego z dwóch źródeł:
+
+- **Neurostate** – dla dowolnego czepka EEG nadającego sygnał przez LSL (Lab Streaming Layer), np. BrainAccess. Gra łączy się z jego wyjściem JSON pod adresem `127.0.0.1:13855`.
+- **ThinkGear Connector** – dla NeuroSky Mobile 2, pod adresem `127.0.0.1:13854`. Działa też każdy inny program obsługujący protokół ThinkGear na tym porcie.
+
+Domyślnie gra używa Neurostate, jeśli jest uruchomiony, a w przeciwnym razie ThinkGear Connectora. Aby zawsze używać jednego z nich, ustaw pole **Source** komponentu `EEGConnectionController` w prefabie `Player` na `NeuroState` lub `ThinkGear`. Tam też można zmienić adres i porty.
+
+Źródło EEG można uruchomić przed grą lub po niej, a także zrestartować w trakcie gry: gra sama się połączy i połączy ponownie.
+
+Przez pierwszą minutę dobrego sygnału Neurostate mierzy stan spoczynku gracza, a ikona połączenia jest żółta. Usiądź wtedy spokojnie z otwartymi oczami, aż ikona zmieni kolor na zielony; do tego czasu skupienie nie steruje grą. Neurostate robi to raz, po swoim uruchomieniu, więc restart gry tego nie powtarza.
 
 ## Sterowanie
 
-Gracz może sterować postacią za pomocą pada lub klawiatury. Urządzenie EEG NeuroSky Mobile 2 jest wykorzystywane do sterowania elementami otoczenia.
+Gracz może sterować postacią za pomocą pada lub klawiatury. Urządzenie EEG jest wykorzystywane do sterowania elementami otoczenia.
 
 ## Tworzenie Poziomów
 
