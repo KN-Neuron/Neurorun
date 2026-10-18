@@ -37,7 +37,7 @@ Gra odczytuje poziom skupienia (attention) z jednego z dwóch źródeł:
 - **Neurostate** – dla dowolnego czepka EEG nadającego sygnał przez LSL (Lab Streaming Layer), np. BrainAccess. Gra łączy się z jego wyjściem JSON pod adresem `127.0.0.1:13855`.
 - **ThinkGear Connector** – dla NeuroSky Mobile 2, pod adresem `127.0.0.1:13854`. Działa też każdy inny program obsługujący protokół ThinkGear na tym porcie.
 
-Domyślnie gra używa Neurostate, jeśli jest uruchomiony, a w przeciwnym razie ThinkGear Connectora. Aby zawsze używać jednego z nich, ustaw pole **Source** komponentu `TGCConnectionController` w prefabie `Player` na `NeuroState` lub `ThinkGear`. Tam też można zmienić adres i porty.
+Domyślnie gra używa Neurostate, jeśli jest uruchomiony, a w przeciwnym razie ThinkGear Connectora. Aby zawsze używać jednego z nich, ustaw pole **Source** komponentu `EEGConnectionController` w prefabie `Player` na `NeuroState` lub `ThinkGear`. Tam też można zmienić adres i porty.
 
 Źródło EEG można uruchomić przed grą lub po niej, a także zrestartować w trakcie gry: gra sama się połączy i połączy ponownie.
 

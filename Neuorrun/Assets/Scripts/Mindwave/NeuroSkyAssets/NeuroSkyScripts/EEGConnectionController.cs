@@ -10,7 +10,9 @@ using System.IO;
 
 namespace MindWave
 {
-    public class TGCConnectionController : MonoBehaviour
+    // Connects to an EEG source through one of the IEEGProtocols, and passes on its ThinkGear packets
+    // to Controller.setPacket and as events.
+    public class EEGConnectionController : MonoBehaviour
     {
         public enum EEGSource
         {
@@ -31,7 +33,6 @@ namespace MindWave
 
         private TcpClient client;
         private Stream stream;
-        private byte[] buffer;
         private Thread thread;
 
         public delegate void UpdateIntValueDelegate(int value);
@@ -90,17 +91,15 @@ namespace MindWave
         // after the game, and reconnects whenever the connection drops.
         public void Connect()
         {
-            EEGSource[] candidates = source == EEGSource.Auto
-                ? new[] { EEGSource.NeuroState, EEGSource.ThinkGear }
-                : new[] { source };
+            IEEGProtocol[] candidates = Candidates();
             bool warned = false;
 
             while (m_waitForExit)
             {
-                EEGSource? connected = null;
-                foreach (EEGSource candidate in candidates)
+                IEEGProtocol connected = null;
+                foreach (IEEGProtocol candidate in candidates)
                 {
-                    if (TryConnect(candidate))
+                    if (TryConnect(candidate.Port))
                     {
                         connected = candidate;
                         break;
@@ -110,17 +109,10 @@ namespace MindWave
                 if (connected != null)
                 {
                     warned = false;
-                    Debug.Log("Connected to " + Describe(connected.Value) + ".");
+                    Debug.Log("Connected to " + Describe(connected) + ".");
                     try
                     {
-                        if (connected == EEGSource.NeuroState)
-                        {
-                            ReadNeuroState();
-                        }
-                        else
-                        {
-                            ReadThinkGear();
-                        }
+                        connected.Read(stream, HandlePacket, () => m_waitForExit);
                     }
                     catch (Exception e) when (e is IOException || e is ObjectDisposedException || e is SocketException)
                     {
@@ -130,7 +122,7 @@ namespace MindWave
                     client = null;
                     if (m_waitForExit)
                     {
-                        Debug.LogWarning("Lost connection to " + Describe(connected.Value) + ".");
+                        Debug.LogWarning("Lost connection to " + Describe(connected) + ".");
                         HandlePacket(NoSignalPacket); // so the game doesn't keep acting on the last values
                     }
                 }
@@ -148,13 +140,28 @@ namespace MindWave
             }
         }
 
+        private IEEGProtocol[] Candidates()
+        {
+            var neuroState = new NeuroStateProtocol(neuroStatePort);
+            var thinkGear = new ThinkGearProtocol(thinkGearPort);
+            switch (source)
+            {
+                case EEGSource.NeuroState:
+                    return new IEEGProtocol[] { neuroState };
+                case EEGSource.ThinkGear:
+                    return new IEEGProtocol[] { thinkGear };
+                default:
+                    return new IEEGProtocol[] { neuroState, thinkGear };
+            }
+        }
+
         // Returns false if the source isn't running.
-        private bool TryConnect(EEGSource from)
+        private bool TryConnect(int port)
         {
             var attempt = new TcpClient();
             try
             {
-                attempt.Connect(host, from == EEGSource.NeuroState ? neuroStatePort : thinkGearPort);
+                attempt.Connect(host, port);
             }
             catch (Exception)
             {
@@ -171,101 +178,9 @@ namespace MindWave
             return true;
         }
 
-        private void ReadThinkGear()
+        private string Describe(IEEGProtocol protocol)
         {
-            buffer = new byte[1024];
-            byte[] myWriteBuffer = Encoding.ASCII.GetBytes(@"{""enableRawOutput"": true, ""format"": ""Json""}");
-            stream.Write(myWriteBuffer, 0, myWriteBuffer.Length);
-
-            while (m_waitForExit && ParseData())
-            {
-                Thread.Sleep(100);
-            }
-        }
-
-        // Neurostate sends one JSON object per line. Each one is passed on as the packet ThinkGear
-        // Connector would send, so the rest of the game handles both sources the same way.
-        private void ReadNeuroState()
-        {
-            using (var reader = new StreamReader(stream, Encoding.ASCII))
-            {
-                string previous = null;
-                string line;
-                while (m_waitForExit && (line = reader.ReadLine()) != null)
-                {
-                    if (line.Length == 0)
-                    {
-                        continue;
-                    }
-                    // Neurostate sends 4 updates a second; passing on only changes keeps HandlePacket's
-                    // poor signal log from repeating
-                    string packet = ToThinkGearPacket(line);
-                    if (packet != null && packet != previous)
-                    {
-                        HandlePacket(packet);
-                        previous = packet;
-                    }
-                }
-            }
-        }
-
-        // One message from Neurostate's JSON output; fields the game doesn't use (t, calibrated, bands) are skipped
-        [Serializable]
-        public class NeuroStateData
-        {
-            public float attention;
-            public float relaxation;
-            public float quality;
-            public string state;
-        }
-
-        // Neurostate's values on ThinkGear's scales, as Neurostate's own ThinkGear output computes
-        // them, except that calibrating isn't reported as a good signal: Neurostate sends a neutral
-        // attention of 50 meanwhile, which is above the default attention threshold.
-        private static string ToThinkGearPacket(string json)
-        {
-            NeuroStateData data;
-            try
-            {
-                data = JsonUtility.FromJson<NeuroStateData>(json);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("Failed to parse Neurostate JSON: " + e.Message);
-                return null;
-            }
-
-            int poorSignal;
-            if (data.state == "ok" || data.state == "uncalibrated")
-            {
-                // Neurostate has no calibration profiles yet, so its usable values come as "uncalibrated"
-                poorSignal = 0;
-            }
-            else if (data.state == "calibrating")
-            {
-                poorSignal = 50; // the connection icon's middle (yellow) colour: good signal, but not ready yet
-            }
-            else if (data.state == "poor_signal")
-            {
-                poorSignal = Mathf.Clamp(Mathf.RoundToInt(200 * (1 - data.quality / 100)), 1, 199);
-            }
-            else
-            {
-                poorSignal = 200; // no_signal, or a state added in a later Neurostate version
-            }
-
-            // eSense values run from 1 to 100; ThinkGear uses 0 to mean the signal is too poor to tell
-            int attention = poorSignal == 0 ? Mathf.Clamp(Mathf.RoundToInt(data.attention), 1, 100) : 0;
-            int meditation = poorSignal == 0 ? Mathf.Clamp(Mathf.RoundToInt(data.relaxation), 1, 100) : 0;
-            return "{\"eSense\":{\"attention\":" + attention + ",\"meditation\":" + meditation +
-                   "},\"poorSignalLevel\":" + poorSignal + "}";
-        }
-
-        private string Describe(EEGSource s)
-        {
-            return s == EEGSource.NeuroState
-                ? "Neurostate on " + host + ":" + neuroStatePort
-                : "ThinkGear Connector on " + host + ":" + thinkGearPort;
+            return protocol.Name + " on " + host + ":" + protocol.Port;
         }
 
         public bool IsConnected()
@@ -340,22 +255,6 @@ namespace MindWave
                 }
             }
             return count;
-        }
-
-        // Reads what ThinkGear Connector sent since the last call; returns false once it closes the connection.
-        private bool ParseData()
-        {
-            if (!stream.CanRead)
-            {
-                return false;
-            }
-            int bytesRead = stream.Read(buffer, 0, buffer.Length);
-            if (bytesRead == 0)
-            {
-                return false;
-            }
-            HandlePacket(Encoding.ASCII.GetString(buffer, 0, bytesRead));
-            return true;
         }
 
         private void HandlePacket(String packet)

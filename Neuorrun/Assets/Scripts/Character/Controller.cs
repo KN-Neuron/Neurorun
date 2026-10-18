@@ -54,7 +54,7 @@ public class Controller : MonoBehaviour
     private bool isFacingRight = true;
     public bool _canInteract = false;
     public bool _isInteracting = false;
-    MindWave.TGCConnectionController tcgController;
+    MindWave.EEGConnectionController tcgController;
     public string packet;
     
     int meditation = 0;
@@ -124,7 +124,7 @@ public class Controller : MonoBehaviour
     void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
-        tcgController = GetComponent<MindWave.TGCConnectionController>();
+        tcgController = GetComponent<MindWave.EEGConnectionController>();
         _attentionTreshold = PlayerPrefs.GetInt("deviceSensitivity", 40);
         UpdateAttentionTreshold();
         _connectionState = FindObjectOfType<ConnectionManager>();
